@@ -1,14 +1,15 @@
 import { Box, Circle, HStack, Text, useTheme, VStack, Pressable, IPressableProps } from 'native-base';
 import { ClockAfternoon, FirstAid, GlobeHemisphereWest, CircleWavyCheck } from 'phosphor-react-native';
 
-export type HospitalProps = {
+export type HospitalProps =  {
         id: string,
         nm_hospital: string,
         latitude: string,
         longitude: string,
         bairro: string,
         cidade: string,
-        lotacao: number
+        lotacao: number,
+        em_aberto: string
 }
 
 type Props = IPressableProps & {
@@ -44,7 +45,7 @@ export function Hospital({ dataHospital, ...rest }: Props) {
                 <HStack alignItems="center">
                     <FirstAid size={15} color={colors.gray[700]}/>
                     <Text color="gray.700" fontSize="xs" ml={1}>
-                        Lotação: {dataHospital.lotacao}
+                        Lotação: {dataHospital.em_aberto} de {dataHospital.lotacao}
                     </Text>
                 </HStack>
             </VStack>
