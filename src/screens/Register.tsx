@@ -16,7 +16,7 @@ type RouteParams = { // Essa tipagem foi criada apenas para que o auto complite 
 
 export function Register() {
     const [isLoading, setIsLoading] = useState(false);
-    
+
     const [nmPaciente, setnmPaciente] = useState('');
     const [cpf, setCpf] = useState('');
     const [telefone, setTelefone] = useState('');
@@ -26,7 +26,8 @@ export function Register() {
     const [saturacao, setSaturacao] = useState('');
     const [temperatura, setTemperatura] = useState('');
     const [problema, setProblema] = useState('');
-    const [risco, setRisco] = useState('G');
+    const [risco, setRisco] = useState< 1 | 2 | 3 >(1);
+    const [disabe, setdisable] = useState('isDisabled')
     const [status, setStatus] = useState('open');
     const [ocultaDados, setOcDados] = useState(false);
 
@@ -37,82 +38,122 @@ export function Register() {
     const handleLogout = Out();
     const { colors } = useTheme();
 
-    function sinaisVitais(idPaciente: string){
-        if(!pressao || !frequencia || !saturacao || !temperatura){
+    function sinaisVitais(idPaciente: string) {
+        if (!pressao || !frequencia || !saturacao || !temperatura) {
             return Alert.alert('Registrar', 'Verifique os campos e tente novamente');
-        }        
-        setIsLoading(true);        
+        }
+        setIsLoading(true);
         firestore()
-        .collection('ATENDIMENTO')
-        .add({
-            hospital: hospitalId,
-            paciente: idPaciente,
-            pressao,
-            frequencia,
-            saturacao,
-            temperatura,
-            problema,
-            risco,
-            status,
-            created_at: firestore.FieldValue.serverTimestamp()           
-        })
-        .then(()=>{
-            Alert.alert('Entrada', 'Registrado com sucesso!');
-            navigation.goBack();
-        })
-        .catch((error) => {
-            console.log(error);
-            setIsLoading(false);
-            return Alert.alert('Registrar', 'Não foi possivel gravar o registro.');
-        });
+            .collection('ATENDIMENTO')
+            .add({
+                hospital: hospitalId,
+                paciente: idPaciente,
+                pressao,
+                frequencia,
+                saturacao,
+                temperatura,
+                problema,
+                risco,
+                status,
+                created_at: firestore.FieldValue.serverTimestamp()
+            })
+            .then(() => {
+                Alert.alert('Entrada', 'Registrado com sucesso!');
+                navigation.goBack();
+            })
+            .catch((error) => {
+                console.log(error);
+                setIsLoading(false);
+                return Alert.alert('Registrar', 'Não foi possivel gravar o registro.');
+            });
     }
 
-    function dadosPessoais(){
-        if(!nmPaciente || !cpf ){
+    function dadosPessoais() {
+        if (!nmPaciente || !cpf) {
             return Alert.alert('Registrar', 'Verifique os campos e tente novamente');
-        }        
-        setIsLoading(true);        
+        }
+        setIsLoading(true);
         firestore()
-        .collection('PACIENTE')
-        .add({
-            nmPaciente,
-            cpf,
-            telefone,                       
-        })
-        .then((docRef)=>{
-            sinaisVitais(docRef.id)
-            //Alert.alert('Entrada', 'Registrado com sucesso!');
-            //console.log("Last Insert ID: "+ docRef.id);            
-            //navigation.goBack();
-        })
-        .catch((error) => {
-            console.log(error);
-            setIsLoading(false);
-            return Alert.alert('Registrar', 'Não foi possivel gravar o registro.');
-        });
+            .collection('PACIENTE')
+            .add({
+                nmPaciente,
+                cpf,
+                telefone,
+            })
+            .then((docRef) => {
+                sinaisVitais(docRef.id)
+                //Alert.alert('Entrada', 'Registrado com sucesso!');
+                //console.log("Last Insert ID: "+ docRef.id);            
+                //navigation.goBack();
+            })
+            .catch((error) => {
+                console.log(error);
+                setIsLoading(false);
+                return Alert.alert('Registrar', 'Não foi possivel gravar o registro.');
+            });
     }
 
-    async function handleNewOrderRegister(){
+    async function handleNewOrderRegister() {
         dadosPessoais()
-
     }
-    function exibeDadosTriagem(){
-        return(
+
+    function exibeDadosTriagem() {
+        return (
             <VStack px={6}>
-                <Input onChangeText={setPressao} placeholder="Pressão" mt={4} keyboardType='numbers-and-punctuation' returnKeyType='done'/>
-                <Input onChangeText={setFrequencia} placeholder="Frequência" mt={4} keyboardType='number-pad' returnKeyType='done'/>
-                <Input onChangeText={setSaturacao} placeholder="Saturação" mt={4} keyboardType='number-pad' returnKeyType='done'/>
-                <Input onChangeText={setTemperatura} placeholder="Temperatura" mt={4} keyboardType='decimal-pad' returnKeyType='done'/>
+                <Input onChangeText={setPressao} placeholder="Pressão" mt={4} keyboardType='numbers-and-punctuation' returnKeyType='done' />
+                <Input onChangeText={setFrequencia} placeholder="Frequência" mt={4} keyboardType='number-pad' returnKeyType='done' />
+                <Input onChangeText={setSaturacao} placeholder="Saturação" mt={4} keyboardType='number-pad' returnKeyType='done' />
+                <Input onChangeText={setTemperatura} placeholder="Temperatura" mt={4} keyboardType='decimal-pad' returnKeyType='done' />
                 <Input
-                    onChangeText={setProblema} 
+                    onChangeText={setProblema}
                     placeholder="Descrição do Problema"
                     flex={1}
                     mt={5}
                     textAlignVertical="top"
                     multiline
-                    h={24}  
+                    h={24}
                 />
-                <Button 
+
+                <HStack  space={4} justifyContent="space-between">
+                    <Button
+                        _focus={{
+                            bg: "green.600",
+                            borderColor: "green.900",
+                            borderWidth: "2px"
+                        }}
+                        title="Leve"
+                        mt={5}
+                        bg={'primary.200'}
+                        onPress={()=>setRisco(1)}
+                        isFocused={risco === 1}                      
+                    />
+                    <Button
+                        _focus={{
+                            bg: "orange.600",
+                            borderColor: "orange.900",
+                            borderWidth: "2px"
+                        }}
+                        title="Moderado"
+                        mt={5}
+                        bg={'primary.200'}
+                        onPress={()=>setRisco(2)}  
+                        isFocused={risco === 2}                      
+                    />
+                    <Button
+                        _focus={{
+                            bg: "red.600",
+                            borderColor: "red.900",
+                            borderWidth: "2px"
+                          }}
+                        title="Grave"
+                        mt={5}
+                        bg={'primary.200'}
+                        onPress={()=>setRisco(3)}
+                        isFocused={risco === 3}                   
+                    />
+                </HStack>
+
+                <Button
                     title="Cadastrar"
                     mt={5}
                     isLoading={isLoading}
@@ -122,82 +163,82 @@ export function Register() {
         )
     }
 
-    
-    function ocultaDadosPessoais(){
-        if(!nmPaciente || !cpf){
+
+    function ocultaDadosPessoais() {
+        if (!nmPaciente || !cpf) {
             return Alert.alert('Registrar', 'Verifique os campos e tente novamente');
         }
         setOcDados(true);
     }
 
-    function exibeDadosPessoais(){
-           
-        return(
+    function exibeDadosPessoais() {
+
+        return (
             <VStack px={6}>
                 <FormControl isRequired>
-                <Input isRequired onChangeText={setnmPaciente} placeholder="Nome" mt={4} returnKeyType='done'/>
-                <Input onChangeText={setCpf} placeholder="cpf" mt={4} keyboardType='number-pad' returnKeyType='done'/>
-                <Input onChangeText={setTelefone} placeholder="(xx)Tele-fone" mt={4} keyboardType='phone-pad' returnKeyType='done'/>
-                <Button 
-                    title="Próximo"
-                    mt={5}
-                    isLoading={isLoading}
-                    onPress={ocultaDadosPessoais}
-                />
+                    <Input isRequired onChangeText={setnmPaciente} placeholder="Nome" mt={4} returnKeyType='done' />
+                    <Input onChangeText={setCpf} placeholder="cpf" mt={4} keyboardType='number-pad' returnKeyType='done' />
+                    <Input onChangeText={setTelefone} placeholder="(xx)Tele-fone" mt={4} keyboardType='phone-pad' returnKeyType='done' />
+                    <Button
+                        title="Próximo"
+                        mt={5}
+                        isLoading={isLoading}
+                        onPress={ocultaDadosPessoais}
+                    />
                 </FormControl>
             </VStack>
         )
-        
+
     }
 
-    useEffect(()=>{
+    useEffect(() => {
         exibeDadosPessoais();
         console.log(ocultaDados);
         console.log(hospitalId);
-        
-    },[ocultaDados])
 
-  return (
+    }, [ocultaDados])
+
+    return (
         <KeyboardAvoidingView
-        behavior="height"
-        keyboardVerticalOffset={80}
-        style={{ flex: 1 }} 
-        bg="#565656"
-    >
-        <ScrollView>
-            <HStack 
-                w="full" 
-                justifyContent="space-between" 
-                alignItems="center" 
-                bg="#FFFAF0" 
-                pt={1} 
-                pb={1} 
-                px={2}
-            >
-            <Logo />
-            <IconButton 
-                icon={ <SignOut size={26} color={colors.black}/> }
-                onPress={handleLogout}
-            />
-            </HStack>
-
-            <HStack bg="gray.500" justifyContent="center" p={4}>
-                <Hourglass size={22} color={colors.green[300]}/>
-                <Text
-                    fontSize="sm"
-                    ml={2}
-                    textTransform="uppercase"
-                    color = {colors.green[300]}
+            behavior="height"
+            keyboardVerticalOffset={80}
+            style={{ flex: 1 }}
+            bg="#565656"
+        >
+            <ScrollView>
+                <HStack
+                    w="full"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    bg="#FFFAF0"
+                    pt={1}
+                    pb={1}
+                    px={2}
                 >
-                    Novo Paciente
-                </Text>
-            </HStack>
-            
-            {ocultaDados ? exibeDadosTriagem() : exibeDadosPessoais()}
+                    <Logo />
+                    <IconButton
+                        icon={<SignOut size={26} color={colors.black} />}
+                        onPress={handleLogout}
+                    />
+                </HStack>
 
-            
-        </ScrollView> 
-    </KeyboardAvoidingView>
-    
-  );
+                <HStack bg="gray.500" justifyContent="center" p={4}>
+                    <Hourglass size={22} color={colors.green[300]} />
+                    <Text
+                        fontSize="sm"
+                        ml={2}
+                        textTransform="uppercase"
+                        color={colors.green[300]}
+                    >
+                        Novo Paciente
+                    </Text>
+                </HStack>
+
+                {ocultaDados ? exibeDadosTriagem() : exibeDadosPessoais()}
+
+
+            </ScrollView>
+        </KeyboardAvoidingView>
+
+    );
 }
