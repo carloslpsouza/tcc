@@ -7,6 +7,7 @@ export type OrderProps = {
     paciente: string,
     nome: string,
     nmPaciente: string,
+    cpf?: string,
     risco: number,
     when: string,
     status: 'open' | 'close',
@@ -46,6 +47,9 @@ export function Order({ data, ...rest }: Props) {
                 <VStack flex={1} my={5} ml={5}>
                     <Text color="black" fontSize="md">
                         Nome: {data.nmPaciente}
+                    </Text>
+                    <Text color="black" fontSize="md">
+                        CPF Parcial: {data.cpf.substring(0,3)}
                     </Text>
 
                     <HStack alignItems="center">

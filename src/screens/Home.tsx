@@ -66,11 +66,12 @@ export function Home() {
         //.where('hospital', '==', hospitalId)
         .onSnapshot( snapshot =>{
             const dataP = snapshot.docs.map(doc =>{
-                const { nmPaciente } = doc.data();
+                const { nmPaciente, cpf } = doc.data();
     
                 return{
                     id: doc.id,
-                    nmPaciente
+                    nmPaciente,
+                    cpf
                 }
             });
             setPacientes(dataP);
