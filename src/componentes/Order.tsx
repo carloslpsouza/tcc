@@ -3,6 +3,7 @@ import { ClockAfternoon, Hourglass, CircleWavyCheck } from 'phosphor-react-nativ
 
 export type OrderProps = {
     id: string,
+    id_at?: string,
     paciente: string,
     nome: string,
     nmPaciente: string,

@@ -3,7 +3,7 @@ export declare global {
         interface RootParamList {
             home: { hospitalId: String};
             new: { hospitalId: String};
-            details: { orderId: String };
+            details: { orderId: String, hospitalId: String };
         }
     }
 }
