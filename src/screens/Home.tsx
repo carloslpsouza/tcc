@@ -41,8 +41,8 @@ export function Home() {
         navigation.navigate('new', { hospitalId })
     }
 
-    function handleOpenDetails(orderId: string ) {
-        navigation.navigate('details', { orderId })
+    function handleOpenDetails(orderId: string, hospitalId: string ) {
+        navigation.navigate('details', { orderId, hospitalId })
     }
 
     function associaNome(){
@@ -52,7 +52,7 @@ export function Home() {
             if(atend.paciente == pac.id){
               let temp = ({...atend, ...pac})
               arrTempAtend.push(temp)
-              console.log(arrTempAtend)
+              //console.log(arrTempAtend)
             }
           })
         })
@@ -77,33 +77,34 @@ export function Home() {
             //setIsLoading(false);
             //setQtderegistros(data.length);
         });
-        //return pacient;
-        
+        //return pacient;        
     }
 
     function getAtendimentos(status: string){
         firestore().collection('ATENDIMENTO')
         .where('hospital', '==', hospitalId)
         .where('status', '==', status)
+        .orderBy('risco', 'desc')
         .onSnapshot( snapshot =>{
             const data = snapshot.docs.map(doc =>{
                 const { status, paciente, risco, created_at } = doc.data();
     
                 return{
-                    id: doc.id,
+                    id_at: doc.id,
                     paciente,
                     risco,
                     status,
                     when: dateFormat(created_at)
                 }
             });
+            console.log(data);
+            
             setAtendimentos(data);
             getPacientes();
             //setIsLoading(false);
             //setQtderegistros(data.length);
-        });
+        },((error)=>console.error(error)));
         return false;
-
     }
     
     useEffect(()=>{
@@ -113,8 +114,7 @@ export function Home() {
         //console.log("pacientes: " + pacientes);
         //console.log("orders: " + orders);
     },[statusSelected]);
-    
-    
+        
     //getAtendimentos
     useEffect(()=>{
         getAtendimentos(statusSelected)
@@ -127,7 +127,6 @@ export function Home() {
     return (
         <VStack flex={1} pb={1} bg="#565656">
             <HStack w="full" justifyContent="space-between" alignItems="center" bg="#FFFAF0" pt={1} pb={1} px={2}>
-
                 <Logo />
                 <IconButton
                     icon={<SignOut size={26} color={colors.black} />}
@@ -166,7 +165,7 @@ export function Home() {
                         <FlatList
                             data={orders}
                             keyExtractor={item => item.id}
-                            renderItem={({ item }) => <Order data={item} onPress={() => handleOpenDetails(item.id)} />}
+                            renderItem={({ item }) => <Order data={item} onPress={() => handleOpenDetails(item.id_at, hospitalId)} />}
                             showsHorizontalScrollIndicator={false}
                             contentContainerStyle={{ paddingBottom: 50 }}
                             ListEmptyComponent={() => (
