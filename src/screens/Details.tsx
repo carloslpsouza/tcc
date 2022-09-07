@@ -169,6 +169,7 @@ export function Details() {
         >
           <CardDetails
             title={pacient.nmPaciente}
+            cpf={pacient.cpf.substring(0,3)}
             pressao={'Freq: ' + order.frequencia}
             saturacao={'Pressão: ' + order.pressao}
             frequencia={'Sat: ' + order.saturacao}

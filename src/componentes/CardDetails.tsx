@@ -4,6 +4,7 @@ import { VStack, HStack, Text, Box, useTheme } from 'native-base';
 
 type Props ={
     title: string;
+    cpf?: string;
     description?: string;
     pressao?: string;
     saturacao?: string;
@@ -16,6 +17,7 @@ type Props ={
 
 export function CardDetails({
     title,
+    cpf,
     description,
     pressao,
     saturacao,
@@ -34,7 +36,12 @@ export function CardDetails({
                 <Text ml={2} color="gray.300" fontSize="sm" textTransform="uppercase">
                     {title}
                 </Text>
-
+                {
+                    !!cpf&&
+                    <Text ml={2} color="gray.300" fontSize="sm" >
+                        CPF Parcial: {cpf}
+                    </Text> 
+                }               
             </HStack>
 
             {
@@ -42,8 +49,7 @@ export function CardDetails({
                 <Text color="gray.300" fontSize="md">
                     { description }
                 </Text>
-            }
-            
+            }            
             <Box borderTopWidth={1} borderTopColor="gray.400" mt={3}>
                 <HStack>
                     <Text ml={0} color="gray.300" fontSize="sm" textTransform="uppercase">
