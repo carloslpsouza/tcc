@@ -3,6 +3,7 @@ import { ClockAfternoon, Hourglass, CircleWavyCheck } from 'phosphor-react-nativ
 
 export type AssentDetails = {
     id: string;
+    userLocal: string;
     observacao: string;
     when: string;
 }
@@ -32,6 +33,9 @@ export function Assentamento({ data, ...rest }: Props) {
                         {data.when}
                     </Text>
                 </HStack>
+                <Text color="gray.700" fontSize="xs" ml={1}>
+                    Responsável: {data.userLocal}
+                </Text>
             </VStack>
         </HStack>
 

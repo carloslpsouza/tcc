@@ -4,6 +4,7 @@ import { Alert } from 'react-native';
 import { VStack, Text, HStack, useTheme, ScrollView, FlatList, Center, AlertDialog } from 'native-base';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth'
 
 import { Header } from '../componentes/Header';
 import { Loading } from '../componentes/Loading';
@@ -35,6 +36,7 @@ type OrderDetails = {
   atendimento: string;
   closed: string;
   status: string;
+  responsavel: string;
 }
 
 type PacienteDetails = {
@@ -56,7 +58,8 @@ export function Details() {
   //const [order, setOrder] = useState({});
   const route = useRoute();
   const navigation = useNavigation();
-  const { orderId, hospitalId, user } = route.params as RouteParams;
+  const { orderId, hospitalId } = route.params as RouteParams;
+  const userLocal = auth().currentUser.email;
 
   function handleOrderClose() {
     if (!atendimento) {
@@ -66,6 +69,7 @@ export function Details() {
       .update({
         status: 'close',
         atendimento,
+        responsavel: userLocal,
         closed_at: firestore.FieldValue.serverTimestamp()
       })
       .then(() => {
@@ -88,6 +92,7 @@ export function Details() {
     firestore().collection('ASSENTAMENTO')
       .add({
         id_at: idAtendimento,
+        userLocal,
         observacao,
         created_at: firestore.FieldValue.serverTimestamp()
       })
@@ -107,10 +112,11 @@ export function Details() {
       //.orderBy('risco', 'desc')
       .onSnapshot(snapshot => {
         const dataAssent = snapshot.docs.map(doc => {
-          const { observacao, created_at } = doc.data();
+          const { observacao, userLocal, created_at } = doc.data();
 
           return {
             id: doc.id,
+            userLocal,
             observacao,
             when: dateFormat(created_at)
           }
@@ -123,8 +129,6 @@ export function Details() {
   }
 
   useEffect(() => {
-    console.log(user);
-    
     firestore().collection<OrderFirestoreDTO>('ATENDIMENTO').doc(orderId).get()
       .then((doc) => {
         const {
@@ -138,7 +142,8 @@ export function Details() {
           temperatura,
           paciente,
           closed_at,
-          atendimento
+          atendimento,
+          responsavel
         } = doc.data();
         //console.log(orderId);
         //console.log(paciente);
@@ -156,7 +161,8 @@ export function Details() {
           when: dateFormat(created_at),
           status,
           atendimento,
-          closed
+          closed,
+          responsavel
         });
         getAssentamento(orderId)
         setIsLoading(false);
@@ -250,7 +256,7 @@ export function Details() {
           <CardDetails
             title='Alta'
             description={order.atendimento}
-            footer={order.closed && 'Alta em: ' + order.closed}
+            footer={order.closed && 'Alta em: ' + order.closed + "\nResponsável: " + order.responsavel}
             icon={CircleWavyCheck}
           >
             {
