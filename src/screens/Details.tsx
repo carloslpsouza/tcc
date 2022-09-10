@@ -1,7 +1,7 @@
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Alert } from 'react-native';
-import { VStack, Text, HStack, useTheme, ScrollView } from 'native-base';
+import { VStack, Text, HStack, useTheme, ScrollView, FlatList, Center, AlertDialog } from 'native-base';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 
@@ -10,7 +10,7 @@ import { Loading } from '../componentes/Loading';
 import { Button } from '../componentes/Button';
 import { CardDetails } from '../componentes/CardDetails';
 
-import { OrderProps } from '../componentes/Order';
+import { Assentamento, AssentDetails } from '../componentes/Assentamento';
 import { OrderFirestoreDTO } from '../DTOs/OderFirestoreDTO';
 import { dateFormat } from '../utils/firestoreDateFormats';
 import { CircleWavyCheck, Heart, Hourglass, Clipboard } from 'phosphor-react-native';
@@ -19,6 +19,7 @@ import { Input } from '../componentes/Input';
 type RouteParams = {
   orderId: string;
   hospitalId: string;
+  user: {};
 }
 
 type OrderDetails = {
@@ -47,20 +48,21 @@ export function Details() {
   const { colors } = useTheme();
   const [isLoading, setIsLoading] = useState(true);
   const [atendimento, setAtendimento] = useState('');
+  const [observacao, setObservacao] = useState('');
+  const [insertReg, setInsertReg] = useState(false);
   const [order, setOrder] = useState<OrderDetails>({} as OrderDetails);
   const [pacient, setPacient] = useState<PacienteDetails>({} as PacienteDetails);
+  const [assentamento, setAssentamento] = useState<AssentDetails[]>([]);
   //const [order, setOrder] = useState({});
   const route = useRoute();
   const navigation = useNavigation();
-  const { orderId, hospitalId } = route.params as RouteParams;
+  const { orderId, hospitalId, user } = route.params as RouteParams;
 
   function handleOrderClose() {
     if (!atendimento) {
       return Alert.alert('Atendimento', 'Descrever  ')
     }
-    firestore()
-      .collection<OrderFirestoreDTO>('ATENDIMENTO')
-      .doc(orderId)
+    firestore().collection<OrderFirestoreDTO>('ATENDIMENTO').doc(orderId)
       .update({
         status: 'close',
         atendimento,
@@ -77,11 +79,53 @@ export function Details() {
 
   }
 
+  function handleOrderAssent(idAtendimento: string) {
+
+    if (!observacao) {
+      return Alert.alert('Registro', 'Descrever  ')
+    }
+    AlertDialog
+    firestore().collection('ASSENTAMENTO')
+      .add({
+        id_at: idAtendimento,
+        observacao,
+        created_at: firestore.FieldValue.serverTimestamp()
+      })
+      .then(() => {
+        Alert.alert('Registro', 'Sucesso')
+        setInsertReg(false)
+      })
+      .catch((error) => {
+        console.log(error);
+        Alert.alert('Registro', 'Não foi possivel realizar o registro')
+      })
+  }
+
+  function getAssentamento(idAtendimento: string) {
+    firestore().collection('ASSENTAMENTO')
+      .where('id_at', '==', idAtendimento)
+      //.orderBy('risco', 'desc')
+      .onSnapshot(snapshot => {
+        const dataAssent = snapshot.docs.map(doc => {
+          const { observacao, created_at } = doc.data();
+
+          return {
+            id: doc.id,
+            observacao,
+            when: dateFormat(created_at)
+          }
+        });
+        //console.log("------------");
+        //console.log(dataAssent);
+        setAssentamento(dataAssent)
+
+      }, ((error) => console.error(error)));
+  }
+
   useEffect(() => {
-    firestore()
-      .collection<OrderFirestoreDTO>('ATENDIMENTO')
-      .doc(orderId)
-      .get()
+    console.log(user);
+    
+    firestore().collection<OrderFirestoreDTO>('ATENDIMENTO').doc(orderId).get()
       .then((doc) => {
         const {
           created_at,
@@ -98,11 +142,8 @@ export function Details() {
         } = doc.data();
         //console.log(orderId);
         //console.log(paciente);
-        getPaciente(paciente);      
-        //getPaciente("4YGiMMiC0W5gLZNnJwVO")
-        
+        getPaciente(paciente);
         const closed = closed_at ? dateFormat(closed_at) : null;
-        
         setOrder({
           id: doc.id,
           paciente,
@@ -117,15 +158,13 @@ export function Details() {
           atendimento,
           closed
         });
+        getAssentamento(orderId)
         setIsLoading(false);
       })
   }, [])
 
   function getPaciente(idPaciente: string) {
-    firestore()
-      .collection<OrderFirestoreDTO>('PACIENTE')
-      .doc(idPaciente)
-      .get()
+    firestore().collection<OrderFirestoreDTO>('PACIENTE').doc(idPaciente).get()
       .then((doc) => {
         const {
           nmPaciente,
@@ -139,11 +178,12 @@ export function Details() {
           telefone
         });
       });
-    }
-    if (isLoading) {
-      return <Loading />
-    }
+  }
+  if (isLoading) {
+    return <Loading />
+  }
 
+  if (!insertReg) {
     return (
       <VStack flex={1} bg="#565656">
         <Header title="Detalhe Atendimento" />
@@ -169,7 +209,7 @@ export function Details() {
         >
           <CardDetails
             title={pacient.nmPaciente}
-            cpf={pacient.cpf.substring(0,3)}
+            cpf={pacient.cpf}
             pressao={'Freq: ' + order.frequencia}
             saturacao={'Pressão: ' + order.pressao}
             frequencia={'Sat: ' + order.saturacao}
@@ -183,7 +223,32 @@ export function Details() {
             icon={Clipboard}
           />
           <CardDetails
-            title='Atendimento'
+            title='Registros'
+            children={
+              <FlatList
+                data={assentamento}
+                keyExtractor={item => item.id}
+                renderItem={({ item }) => <Assentamento data={item} /* onPress={ () => handleOpenDetails(item.id_at, hospitalId) }  */ />}
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ paddingBottom: 50 }}
+                ListEmptyComponent={() => (
+                  <Text></Text>
+                )}
+              />
+            }
+            icon={Clipboard}
+          />
+          {
+            order.status === 'open' &&
+            <Button
+              title='Novo registro'
+              m={5}
+              onPress={() => { setInsertReg(true) }}
+            />
+          }
+
+          <CardDetails
+            title='Alta'
             description={order.atendimento}
             footer={order.closed && 'Alta em: ' + order.closed}
             icon={CircleWavyCheck}
@@ -200,10 +265,9 @@ export function Details() {
                 multiline
                 h={24}
               />
-
             }
-
           </CardDetails>
+
         </ScrollView>
         {
           order.status === 'open' &&
@@ -213,8 +277,46 @@ export function Details() {
             onPress={handleOrderClose}
           />
         }
-
       </VStack>
     );
-  
+  } else {
+    return (
+      <VStack flex={1} bg="#565656">
+        <Header title="Novo registro" />
+        <CardDetails
+          title='Registro'
+          description={""}
+          icon={CircleWavyCheck}
+        >
+          {
+            order.status === 'open' &&
+            <Input
+              bg="gray.600"
+              color={colors.light[100]}
+              placeholder='Descrição:'
+              placeholderTextColor={colors.light[100]}
+              onChangeText={setObservacao}
+              textAlignVertical="top"
+              multiline
+              h={24}
+            />
+          }
+        </CardDetails>
+
+
+        <Button
+          title='Cancelar'
+          m={5}
+          onPress={() => { setInsertReg(false) }}
+        />
+        <Button
+          title='Gravar'
+          m={5}
+          onPress={() => { handleOrderAssent(orderId) }}
+        />
+      </VStack>
+
+    )
+  }
+
 }

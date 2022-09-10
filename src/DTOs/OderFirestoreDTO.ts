@@ -1,6 +1,8 @@
 import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 
 export type OrderFirestoreDTO = {
+    id_at: string, //Assentamentos
+    observacao: string, //Assentamentos
     paciente: string,//novo
     nmPaciente: string,//novo
     nome: string;
