@@ -228,22 +228,27 @@ export function Details() {
             description={'Reclamação: ' + order.problema}
             icon={Clipboard}
           />
-          <CardDetails
-            title='Registros'
-            children={
-              <FlatList
-                data={assentamento}
-                keyExtractor={item => item.id}
-                renderItem={({ item }) => <Assentamento data={item} /* onPress={ () => handleOpenDetails(item.id_at, hospitalId) }  */ />}
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{ paddingBottom: 50 }}
-                ListEmptyComponent={() => (
-                  <Text></Text>
-                )}
-              />
-            }
-            icon={Clipboard}
-          />
+                    
+          {
+            assentamento.length >=1 &&
+            <CardDetails
+              title='Registros'
+              children={
+                <FlatList
+                  data={assentamento}
+                  keyExtractor={item => item.id}
+                  renderItem={({ item }) => <Assentamento data={item} /* onPress={ () => handleOpenDetails(item.id_at, hospitalId) }  */ />}
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={{ paddingBottom: 50 }}
+                  ListEmptyComponent={() => (
+                    <Text></Text>
+                  )}
+                />
+              }
+              icon={Clipboard}
+            />
+          }
+
           {
             order.status === 'open' &&
             <Button
