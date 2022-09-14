@@ -58,7 +58,7 @@ export function Home() {
         })
         setOrders(arrTempAtend);
         setQtderegistros(arrTempAtend.length);
-        setIsLoading(false); 
+        
       }
       
     function getPacientes(){
@@ -75,7 +75,7 @@ export function Home() {
                 }
             });
             setPacientes(dataP);
-            //setIsLoading(false);
+            setIsLoading(false);
             //setQtderegistros(data.length);
         });
         //return pacient;        
@@ -109,7 +109,6 @@ export function Home() {
     }
     
     useEffect(()=>{
-        setIsLoading(false);
         console.log(statusSelected);        
         //console.log("atendimentos: " + atendimentos);
         //console.log("pacientes: " + pacientes);

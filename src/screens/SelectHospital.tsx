@@ -21,8 +21,7 @@ export function SelectHospital() {
     const { colors } = useTheme();
     const [hospitais, setHospitais] = useState<HospitalProps[]>([]);
     const [qtdeRegistros, setQtderegistros] = useState(0);
-    const [emAb, setEmAb] = useState([])
-
+    
     const handleLogout = Out();
 
     const navigation = useNavigation();
@@ -33,7 +32,7 @@ export function SelectHospital() {
     }
 
     useEffect(() => {
-        setIsLoading(true);
+        //setIsLoading(true);
 
         let arrTempHsp = [];
         let i = 0
@@ -51,7 +50,8 @@ export function SelectHospital() {
             //console.log(i);
             i -= 1
             if(i===0){
-                setHospitais(arrTempHsp)
+                setHospitais(arrTempHsp);
+                setIsLoading(false);
             }                        
         }
 
@@ -77,8 +77,6 @@ export function SelectHospital() {
                 })
                 //setHospitais(data);
                 //console.log(data);
-                
-                setIsLoading(false);
                 setQtderegistros(data.length);
             });            
         return subscribe;
