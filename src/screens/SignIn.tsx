@@ -53,7 +53,7 @@ export function SignIn(){
             pt={24}
         >       
             <Logo />
-            <Heading color="#000000" fontSize="xl" mt={20} mb={6}>
+            <Heading color="#FFF" fontSize="xl" mt={20} mb={6}>
                 Acesse sua conta
             </Heading>
             <ScrollView style={{width:"100%"}}>
