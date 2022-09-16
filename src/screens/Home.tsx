@@ -89,14 +89,17 @@ export function Home() {
         .onSnapshot( snapshot =>{
             const data = snapshot.docs.map(doc =>{
                 const { status, paciente, risco, created_at } = doc.data();
-                //console.log(dateFormat(created_at) != Date());
-                /* console.log(dateFormat(created_at).substring());
-                console.log(new Date()); */           
+                console.log(status);
+                let dataBd = created_at.toDate().toString().substring(0,9);
+                let dataAgora = new Date().toDateString().substring(0,9);
+                console.log(dataBd === dataAgora);
+                console.log(dataBd);
+                console.log(dataAgora);           
                 
                 
-                if(status === "close" && created_at != Date()){
+                if(status === "close" && dataBd != dataAgora){
                     return{
-                        
+                       
                     }
                 }else{
                     return{
@@ -108,7 +111,7 @@ export function Home() {
                     }
                 }             
             });
-            console.log(data);
+            //console.log(data);
             
             setAtendimentos(data);
             getPacientes();
@@ -119,7 +122,7 @@ export function Home() {
     }
     
     useEffect(()=>{
-        console.log(statusSelected);
+        //console.log(statusSelected);
         setIsLoading(true);    
         //console.log("atendimentos: " + atendimentos);
         //console.log("pacientes: " + pacientes);
