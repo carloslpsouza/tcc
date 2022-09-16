@@ -5,9 +5,10 @@ import { SignOut } from 'phosphor-react-native';
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { Hourglass } from 'phosphor-react-native';
 import { Input } from '../componentes/Input';
+import InputMask from "../componentes/InputMask";
 import { Button } from '../componentes/Button';
 import firestore from '@react-native-firebase/firestore';
-import Logo from '../assets/Screening.svg';
+import Logo from '../assets/Logo.svg';
 import { Out } from '../utils/Out';
 
 type RouteParams = { // Essa tipagem foi criada apenas para que o auto complite pudesse achar esse paramentro (Testar sem)
@@ -26,8 +27,8 @@ export function Register() {
     const [saturacao, setSaturacao] = useState('');
     const [temperatura, setTemperatura] = useState('');
     const [problema, setProblema] = useState('');
-    const [risco, setRisco] = useState< 1 | 2 | 3 >(1);
-    const [disabe, setdisable] = useState('isDisabled')
+    const [risco, setRisco] = useState<1 | 2 | 3>(1);
+    //const [disabe, setdisable] = useState('isDisabled')
     const [status, setStatus] = useState('open');
     const [ocultaDados, setOcDados] = useState(false);
 
@@ -80,11 +81,8 @@ export function Register() {
                 cpf,
                 telefone,
             })
-            .then((docRef) => {
+            .then((docRef) => { //docRef retorna LastInsertID
                 sinaisVitais(docRef.id)
-                //Alert.alert('Entrada', 'Registrado com sucesso!');
-                //console.log("Last Insert ID: "+ docRef.id);            
-                //navigation.goBack();
             })
             .catch((error) => {
                 console.log(error);
@@ -100,10 +98,26 @@ export function Register() {
     function exibeDadosTriagem() {
         return (
             <VStack px={6}>
-                <Input onChangeText={setPressao} placeholder="Pressão" mt={4} keyboardType='numbers-and-punctuation' returnKeyType='done' />
+                <InputMask
+                    value={pressao}
+                    mask="pressao"
+                    maxLength={6}
+                    placeholder="Pressão"
+                    placeholderTextColor="#000"
+                    inputMaskChange={(text: string) => setPressao(text)}
+                    keyboardType='number-pad'
+                />
                 <Input onChangeText={setFrequencia} placeholder="Frequência" mt={4} keyboardType='number-pad' returnKeyType='done' />
                 <Input onChangeText={setSaturacao} placeholder="Saturação" mt={4} keyboardType='number-pad' returnKeyType='done' />
-                <Input onChangeText={setTemperatura} placeholder="Temperatura" mt={4} keyboardType='decimal-pad' returnKeyType='done' />
+                <InputMask
+                    value={temperatura}
+                    mask="temperatura"
+                    maxLength={6}
+                    placeholder="Temperatura"
+                    placeholderTextColor="#000"
+                    inputMaskChange={(text: string) => setTemperatura(text)}
+                    keyboardType='number-pad'
+                />
                 <Input
                     onChangeText={setProblema}
                     placeholder="Descrição do Problema"
@@ -114,7 +128,7 @@ export function Register() {
                     h={24}
                 />
 
-                <HStack  space={4} justifyContent="space-between">
+                <HStack space={4} justifyContent="space-between">
                     <Button
                         _focus={{
                             bg: "green.600",
@@ -124,8 +138,8 @@ export function Register() {
                         title="Leve"
                         mt={5}
                         bg={'primary.200'}
-                        onPress={()=>setRisco(1)}
-                        isFocused={risco === 1}                      
+                        onPress={() => setRisco(1)}
+                        isFocused={risco === 1}
                     />
                     <Button
                         _focus={{
@@ -136,20 +150,20 @@ export function Register() {
                         title="Moderado"
                         mt={5}
                         bg={'primary.200'}
-                        onPress={()=>setRisco(2)}  
-                        isFocused={risco === 2}                      
+                        onPress={() => setRisco(2)}
+                        isFocused={risco === 2}
                     />
                     <Button
                         _focus={{
                             bg: "red.600",
                             borderColor: "red.900",
                             borderWidth: "2px"
-                          }}
+                        }}
                         title="Grave"
                         mt={5}
                         bg={'primary.200'}
-                        onPress={()=>setRisco(3)}
-                        isFocused={risco === 3}                   
+                        onPress={() => setRisco(3)}
+                        isFocused={risco === 3}
                     />
                 </HStack>
 
@@ -177,8 +191,24 @@ export function Register() {
             <VStack px={6}>
                 <FormControl isRequired>
                     <Input isRequired onChangeText={setnmPaciente} placeholder="Nome" mt={4} returnKeyType='done' />
-                    <Input onChangeText={setCpf} placeholder="cpf" mt={4} keyboardType='number-pad' returnKeyType='done' />
-                    <Input onChangeText={setTelefone} placeholder="(xx)Tele-fone" mt={4} keyboardType='phone-pad' returnKeyType='done' />
+                    <InputMask
+                        value={cpf}
+                        mask="cpf"
+                        maxLength={14}
+                        placeholder="CPF"
+                        placeholderTextColor="#000"
+                        inputMaskChange={(text: string) => setCpf(text)}
+                        keyboardType='number-pad'
+                    />
+                    <InputMask
+                        value={telefone}
+                        mask="phone"
+                        maxLength={14}
+                        placeholder="(99)9999-9999"
+                        placeholderTextColor="#000"
+                        inputMaskChange={(text: string) => setTelefone(text)}
+                        keyboardType='number-pad'
+                    />
                     <Button
                         title="Próximo"
                         mt={5}
