@@ -217,7 +217,7 @@ export function Details() {
             title={pacient.nmPaciente}
             cpf={pacient.cpf}
             pressao={'Freq: ' + order.frequencia}
-            saturacao={'Pressão: ' + order.pressao}
+            saturacao={'Pres: ' + order.pressao}
             frequencia={'Sat: ' + order.saturacao}
             temperatura={'Temp: ' + order.temperatura}
             icon={Heart}

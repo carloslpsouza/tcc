@@ -39,7 +39,7 @@ export function CardDetails({
                 {
                     !!cpf&&
                     <Text ml={2} color="gray.300" fontSize="sm" >
-                        CPF Parcial: {cpf}
+                        CPF: {cpf}
                     </Text> 
                 }               
             </HStack>
