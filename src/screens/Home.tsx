@@ -58,7 +58,7 @@ export function Home() {
         })
         setOrders(arrTempAtend);
         setQtderegistros(arrTempAtend.length);
-        setIsLoading(false); 
+        
       }
       
     function getPacientes(){
@@ -75,7 +75,7 @@ export function Home() {
                 }
             });
             setPacientes(dataP);
-            //setIsLoading(false);
+            setIsLoading(false);
             //setQtderegistros(data.length);
         });
         //return pacient;        
@@ -89,16 +89,29 @@ export function Home() {
         .onSnapshot( snapshot =>{
             const data = snapshot.docs.map(doc =>{
                 const { status, paciente, risco, created_at } = doc.data();
-    
-                return{
-                    id_at: doc.id,
-                    paciente,
-                    risco,
-                    status,
-                    when: dateFormat(created_at)
-                }
+                console.log(status);
+                let dataBd = created_at.toDate().toString().substring(0,9);
+                let dataAgora = new Date().toDateString().substring(0,9);
+                /* console.log(dataBd === dataAgora);
+                console.log(dataBd);
+                console.log(dataAgora); */           
+                
+                
+                if(status === "close" && dataBd != dataAgora){
+                    return{
+                       
+                    }
+                }else{
+                    return{
+                        id_at: doc.id,
+                        paciente,
+                        risco,
+                        status,
+                        when: dateFormat(created_at)
+                    }
+                }             
             });
-            console.log(data);
+            //console.log(data);
             
             setAtendimentos(data);
             getPacientes();
@@ -109,8 +122,8 @@ export function Home() {
     }
     
     useEffect(()=>{
-        setIsLoading(false);
-        console.log(statusSelected);        
+        //console.log(statusSelected);
+        setIsLoading(true);    
         //console.log("atendimentos: " + atendimentos);
         //console.log("pacientes: " + pacientes);
         //console.log("orders: " + orders);
