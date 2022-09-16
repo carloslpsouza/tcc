@@ -89,14 +89,24 @@ export function Home() {
         .onSnapshot( snapshot =>{
             const data = snapshot.docs.map(doc =>{
                 const { status, paciente, risco, created_at } = doc.data();
-    
-                return{
-                    id_at: doc.id,
-                    paciente,
-                    risco,
-                    status,
-                    when: dateFormat(created_at)
-                }
+                //console.log(dateFormat(created_at) != Date());
+                /* console.log(dateFormat(created_at).substring());
+                console.log(new Date()); */           
+                
+                
+                if(status === "close" && created_at != Date()){
+                    return{
+                        
+                    }
+                }else{
+                    return{
+                        id_at: doc.id,
+                        paciente,
+                        risco,
+                        status,
+                        when: dateFormat(created_at)
+                    }
+                }             
             });
             console.log(data);
             
@@ -109,7 +119,8 @@ export function Home() {
     }
     
     useEffect(()=>{
-        console.log(statusSelected);        
+        console.log(statusSelected);
+        setIsLoading(true);    
         //console.log("atendimentos: " + atendimentos);
         //console.log("pacientes: " + pacientes);
         //console.log("orders: " + orders);
@@ -179,7 +190,7 @@ export function Home() {
                         />
                 }
 
-                {/* <Button title="Novo Paciente" mb={5} onPress={()=>handleNewOrder(hospitalId)} /> */}
+                <Button title="Novo Paciente" mb={5} onPress={()=>handleNewOrder(hospitalId)} />
             </VStack>
 
         </VStack>
