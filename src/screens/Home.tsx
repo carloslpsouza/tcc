@@ -29,7 +29,7 @@ export function Home() {
     const [atendimentos, setAtendimentos] = useState([])
 
     const [qtdeRegistros, setQtderegistros] = useState(0);
-    
+
     const navigation = useNavigation();
     const route = useRoute();
     const { hospitalId } = route.params as RouteParams; // o route.params não sabe qual é então foi criada a tipagem acima
@@ -41,102 +41,104 @@ export function Home() {
         navigation.navigate('new', { hospitalId })
     }
 
-    function handleOpenDetails(orderId: string, hospitalId: string ) {
+    function handleOpenDetails(orderId: string, hospitalId: string) {
         navigation.navigate('details', { orderId, hospitalId })
     }
 
-    function associaNome(){
+    function associaNome() {
         let arrTempAtend = [];
-         atendimentos.map((atend)=>{
-          pacientes.map((pac)=>{
-            if(atend.paciente == pac.id){
-              let temp = ({...atend, ...pac})
-              arrTempAtend.push(temp)
-              //console.log(arrTempAtend)
-            }
-          })
+        atendimentos.map((atend) => {
+            pacientes.map((pac) => {
+                if (atend.paciente == pac.id) {
+                    let temp = ({ ...atend, ...pac })
+                    arrTempAtend.push(temp)
+                    //console.log(arrTempAtend)
+                }
+            })
         })
         setOrders(arrTempAtend);
         setQtderegistros(arrTempAtend.length);
-        
-      }
-      
-    function getPacientes(){
+
+    }
+
+    function getPacientes() {
         firestore().collection('PACIENTE')
-        //.where('hospital', '==', hospitalId)
-        .onSnapshot( snapshot =>{
-            const dataP = snapshot.docs.map(doc =>{
-                const { nmPaciente, cpf } = doc.data();
-    
-                return{
-                    id: doc.id,
-                    nmPaciente,
-                    cpf
-                }
+            //.where('hospital', '==', hospitalId)
+            .onSnapshot(snapshot => {
+                const dataP = snapshot.docs.map(doc => {
+                    const { nmPaciente, cpf } = doc.data();
+
+                    return {
+                        id: doc.id,
+                        nmPaciente,
+                        cpf
+                    }
+                });
+                setPacientes(dataP);
+                setIsLoading(false);
+                //setQtderegistros(data.length);
             });
-            setPacientes(dataP);
-            setIsLoading(false);
-            //setQtderegistros(data.length);
-        });
         //return pacient;        
     }
 
-    function getAtendimentos(status: string){
+    function getAtendimentos(status: string) {
         firestore().collection('ATENDIMENTO')
-        .where('hospital', '==', hospitalId)
-        .where('status', '==', status)
-        .orderBy('risco', 'desc')
-        .onSnapshot( snapshot =>{
-            const data = snapshot.docs.map(doc =>{
-                const { status, paciente, risco, created_at } = doc.data();
-                console.log(status);
-                let dataBd = created_at.toDate().toString().substring(0,9);
-                let dataAgora = new Date().toDateString().substring(0,9);
-                /* console.log(dataBd === dataAgora);
-                console.log(dataBd);
-                console.log(dataAgora); */           
-                
-                
-                if(status === "close" && dataBd != dataAgora){
-                    return{
-                       
+            .where('hospital', '==', hospitalId)
+            .where('status', '==', status)
+            .orderBy('risco', 'desc')
+            .onSnapshot(snapshot => {
+                const data = snapshot.docs.map(doc => {
+                    const { status, paciente, risco, created_at, closed_at } = doc.data();
+                    console.log(statusSelected);                    
+                    if (closed_at) {
+                        let dataBd = closed_at ? closed_at.toDate().toString().substring(0, 9) : new Date().toDateString().substring(0, 9);
+                        let dataAgora = new Date().toDateString().substring(0, 9);
+                        /* console.log(dataBd === dataAgora);
+                        console.log(dataBd);
+                        console.log(dataAgora); */
+
+                        if (status === "close" && dataBd != dataAgora) {
+                            return {
+
+                            }
+                        }
                     }
-                }else{
-                    return{
+
+                    return {
                         id_at: doc.id,
                         paciente,
                         risco,
                         status,
                         when: dateFormat(created_at)
                     }
-                }             
-            });
-            //console.log(data);
-            
-            setAtendimentos(data);
-            getPacientes();
-            //setIsLoading(false);
-            //setQtderegistros(data.length);
-        },((error)=>console.error(error)));
+
+                });
+                //console.log(data);
+
+                setAtendimentos(data);
+                getPacientes();
+                //setIsLoading(false);
+                //setQtderegistros(data.length);
+            }, ((error) => console.error(error)));
         return false;
     }
-    
-    useEffect(()=>{
-        //console.log(statusSelected);
-        setIsLoading(true);    
+
+    useEffect(() => {
+        console.log("UE" + statusSelected);
+        setIsLoading(true);
         //console.log("atendimentos: " + atendimentos);
         //console.log("pacientes: " + pacientes);
         //console.log("orders: " + orders);
-    },[statusSelected]);
-        
+    }, [statusSelected]);
+
     //getAtendimentos
-    useEffect(()=>{
+    useEffect(() => {
         getAtendimentos(statusSelected)
-    },[statusSelected]);
+    }, [statusSelected]);
     //associaNome
-    useEffect(()=>{
+    useEffect(() => {
         associaNome()
-    },[pacientes]);
+    }, [pacientes]);
 
     return (
         <VStack flex={1} pb={1} bg="#565656">
@@ -193,7 +195,7 @@ export function Home() {
                         />
                 }
 
-                <Button title="Novo Paciente" mb={5} onPress={()=>handleNewOrder(hospitalId)} />
+                <Button title="Novo Paciente" mb={5} onPress={() => handleNewOrder(hospitalId)} />
             </VStack>
 
         </VStack>
