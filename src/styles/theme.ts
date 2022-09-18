@@ -24,10 +24,10 @@ export const THEME = extendTheme({
     },
     white: '#FFFFFF'
   },
-  fonts: {
+/*   fonts: {
     heading: 'Roboto_700Bold',
     body: 'Roboto_400Regular',
-  },
+  }, */
   fontSizes: {
     xs: 12,
     sm: 14,
