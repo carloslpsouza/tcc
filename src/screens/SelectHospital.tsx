@@ -6,7 +6,7 @@ import { HStack, IconButton, VStack, useTheme, Text, Heading, FlatList, Center }
 import { SignOut } from 'phosphor-react-native';
 import { ChatTeardropText } from 'phosphor-react-native';
 
-import Logo from '../assets/Screening.svg';
+import Logo from '../assets/Logo.svg';
 import { Hospital, HospitalProps } from '../componentes/Hospital'
 
 import { Loading } from '../componentes/Loading';
@@ -32,7 +32,7 @@ export function SelectHospital() {
     }
 
     useEffect(() => {
-        //setIsLoading(true);
+        setIsLoading(true);
 
         let arrTempHsp = [];
         let i = 0

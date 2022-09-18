@@ -12,10 +12,6 @@
     "android": {
       "package": "com.screening",
       "googleServicesFile": "./google-services.json"
-    },
-    "ios": {
-      "bundleRdentifier": "com.screening",
-      "googleServicesFile": "./GoogleService-Info.plist"
     }
   }
 }

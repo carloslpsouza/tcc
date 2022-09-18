@@ -8,7 +8,7 @@ import { Input } from '../componentes/Input';
 import InputMask from "../componentes/InputMask";
 import { Button } from '../componentes/Button';
 import firestore from '@react-native-firebase/firestore';
-import Logo from '../assets/Screening.svg';
+import Logo from '../assets/Logo.svg';
 import { Out } from '../utils/Out';
 
 type RouteParams = { // Essa tipagem foi criada apenas para que o auto complite pudesse achar esse paramentro (Testar sem)

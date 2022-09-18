@@ -7,7 +7,7 @@ import { SignOut } from 'phosphor-react-native';
 
 import { dateFormat } from '../utils/firestoreDateFormats'
 
-import Logo from '../assets/Screening.svg';
+import Logo from '../assets/Logo.svg';
 import { Filter } from '../componentes/Filter';
 import { Button } from '../componentes/Button';
 import { Order, OrderProps } from '../componentes/Order'
