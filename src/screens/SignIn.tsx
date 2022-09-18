@@ -18,7 +18,7 @@ export function SignIn(){
         if(!email || !email){
             return Alert.alert('Entrar', 'Informe e-mail e senha');
         }
-        setIsLoading(true);
+        //setIsLoading(true);
         auth()
             .signInWithEmailAndPassword(email, password)
             .then(response =>{
