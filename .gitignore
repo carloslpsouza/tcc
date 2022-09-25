@@ -122,6 +122,6 @@ dist/
 /GoogleService-Info.plist
 
 #KWB
-/kwb.doc
+/kwb.txt
 
-/splash
+/src/SplashScreen
