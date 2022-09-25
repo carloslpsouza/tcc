@@ -1,5 +1,7 @@
 import { Box, Circle, HStack, Text, useTheme, VStack, Pressable, IPressableProps } from 'native-base';
-import { ClockAfternoon, Hourglass, CircleWavyCheck } from 'phosphor-react-native';
+import { ClockAfternoon, Hourglass, CircleWavyCheck, FirstAid } from 'phosphor-react-native';
+import { especColors } from "../styles/especColors"
+import { msg } from "../utils/mensagensPadrao"
 
 export type OrderProps = {
     id: string,
@@ -20,16 +22,12 @@ type Props = IPressableProps & {
 export function Order({ data, ...rest }: Props) {
     const { colors } = useTheme();
     const statusColor = (data.status === 'open' ? colors.gray[200] : colors.gray[100])
-    const riskColor = (par: number) => {
-        if(par === 3){
-            return colors.red[600];
-        }
-        if(par === 2){
-            return colors.orange[400];
-        }
-        if(par === 1){
-            return colors.green[600];
-        }
+    const risco = (par: number) => {
+        if(par === 1){ return {'cor': especColors.risco.naoUrgencia, 'msg': msg.risco.naoUrgencia}; }
+        if(par === 2){ return {'cor': especColors.risco.poucaUrgencia, 'msg': msg.risco.poucaUrgencia}; }
+        if(par === 3){ return {'cor': especColors.risco.urgencia, 'msg': msg.risco.urgencia}; }
+        if(par === 4){ return {'cor': especColors.risco.muitaUrgencia, 'msg': msg.risco.muitaUrgencia}; }
+        if(par === 5){ return {'cor': especColors.risco.emergencia, 'msg': msg.risco.emergencia}; }
     }
     
 
@@ -43,7 +41,7 @@ export function Order({ data, ...rest }: Props) {
                 rounded="sm"
                 overflow="hidden"
             >
-                <Box h="full" w={4} bg={riskColor(data.risco)} />
+                <Box h="full" w={4} bg={risco(data.risco).cor} />
                 <VStack flex={1} my={5} ml={5}>
                     <Text color="black" fontSize="md">
                         Nome: {data.nmPaciente}
@@ -56,6 +54,12 @@ export function Order({ data, ...rest }: Props) {
                         <ClockAfternoon size={15} color={colors.gray[700]} />
                         <Text color="gray.700" fontSize="xs" ml={1}>
                             {data.when}
+                        </Text>
+                    </HStack>
+                    <HStack alignItems="center">
+                        <FirstAid size={15} color={colors.gray[700]} />
+                        <Text color="gray.700" fontSize="xs" ml={1}>
+                            {risco(data.risco).msg}
                         </Text>
                     </HStack>
                 </VStack>

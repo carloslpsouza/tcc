@@ -1,6 +1,6 @@
 import { Alert, ScrollView } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { Heading, HStack, IconButton, KeyboardAvoidingView, useTheme, VStack, Text, FormControl } from 'native-base';
+import { Heading, HStack, IconButton, KeyboardAvoidingView, useTheme, VStack, Text, FormControl, Select } from 'native-base';
 import { SignOut } from 'phosphor-react-native';
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { Hourglass } from 'phosphor-react-native';
@@ -9,6 +9,7 @@ import InputMask from "../componentes/InputMask";
 import { Button } from '../componentes/Button';
 import firestore from '@react-native-firebase/firestore';
 import Logo from '../assets/Logo.svg';
+import { especColors } from "../styles/especColors"
 import { Out } from '../utils/Out';
 
 type RouteParams = { // Essa tipagem foi criada apenas para que o auto complite pudesse achar esse paramentro (Testar sem)
@@ -27,8 +28,8 @@ export function Register() {
     const [saturacao, setSaturacao] = useState('');
     const [temperatura, setTemperatura] = useState('');
     const [problema, setProblema] = useState('');
-    const [risco, setRisco] = useState<1 | 2 | 3>(1);
-    //const [disabe, setdisable] = useState('isDisabled')
+    const [risco, setRisco] = useState<Number>();
+    const [corRisco, setCorRisco] = useState('')
     const [status, setStatus] = useState('open');
     const [ocultaDados, setOcDados] = useState(false);
 
@@ -38,7 +39,7 @@ export function Register() {
 
     const handleLogout = Out();
     const { colors } = useTheme();
-
+    
     function sinaisVitais(idPaciente: string) {
         if (!pressao || !frequencia || !saturacao || !temperatura) {
             return Alert.alert('Registrar', 'Verifique os campos e tente novamente');
@@ -103,7 +104,7 @@ export function Register() {
                     mask="pressao"
                     maxLength={6}
                     placeholder="Pressão"
-                    placeholderTextColor="#000"
+                    placeholderTextColor={colors.black}
                     inputMaskChange={(text: string) => setPressao(text)}
                     keyboardType='number-pad'
                 />
@@ -114,7 +115,7 @@ export function Register() {
                     mask="temperatura"
                     maxLength={6}
                     placeholder="Temperatura"
-                    placeholderTextColor="#000"
+                    placeholderTextColor={colors.black}
                     inputMaskChange={(text: string) => setTemperatura(text)}
                     keyboardType='number-pad'
                 />
@@ -127,44 +128,31 @@ export function Register() {
                     multiline
                     h={24}
                 />
-
                 <HStack space={4} justifyContent="space-between">
-                    <Button
-                        _focus={{
-                            bg: "green.600",
-                            borderColor: "green.900",
-                            borderWidth: "2px"
+                    <Select 
+                        selectedValue={String(risco)}
+                        flex={1}
+                        minWidth="200" 
+                        accessibilityLabel="Grau de risco"
+                        placeholder="Grau de risco"
+                        fontSize={'lg'}
+                        backgroundColor={corRisco}
+                        _selectedItem={{
+                            bg: corRisco,
+                            _text:{color:colors.white} 
                         }}
-                        title="Leve"
-                        mt={5}
-                        bg={'primary.200'}
-                        onPress={() => setRisco(1)}
-                        isFocused={risco === 1}
-                    />
-                    <Button
-                        _focus={{
-                            bg: "orange.600",
-                            borderColor: "orange.900",
-                            borderWidth: "2px"
-                        }}
-                        title="Moderado"
-                        mt={5}
-                        bg={'primary.200'}
-                        onPress={() => setRisco(2)}
-                        isFocused={risco === 2}
-                    />
-                    <Button
-                        _focus={{
-                            bg: "red.600",
-                            borderColor: "red.900",
-                            borderWidth: "2px"
-                        }}
-                        title="Grave"
-                        mt={5}
-                        bg={'primary.200'}
-                        onPress={() => setRisco(3)}
-                        isFocused={risco === 3}
-                    />
+                        _item={{
+                            _text:{color:colors.white}                            
+                        }} 
+                        mt={2}
+                        h={20}
+                        onValueChange={(itemValue) => setRisco(Number(itemValue))}>
+                        <Select.Item mt={2} backgroundColor={especColors.risco.naoUrgencia} label="Não é urgente" value="1" ></Select.Item>
+                        <Select.Item mt={2} backgroundColor={especColors.risco.poucaUrgencia} label="Pouca urgência" value="2" />
+                        <Select.Item mt={2} backgroundColor={especColors.risco.urgencia} label="Urgência" value="3" />
+                        <Select.Item mt={2} backgroundColor={especColors.risco.muitaUrgencia} label="Muita urgência" value="4" />
+                        <Select.Item mt={2} fontWeight="bold" backgroundColor={especColors.risco.emergencia} label="Emergência" value="5" />
+                    </Select>                    
                 </HStack>
 
                 <Button
@@ -196,7 +184,7 @@ export function Register() {
                         mask="cpf"
                         maxLength={14}
                         placeholder="CPF"
-                        placeholderTextColor="#000"
+                        placeholderTextColor={colors.black}
                         inputMaskChange={(text: string) => setCpf(text)}
                         keyboardType='number-pad'
                     />
@@ -205,7 +193,7 @@ export function Register() {
                         mask="phone"
                         maxLength={14}
                         placeholder="(99)9999-9999"
-                        placeholderTextColor="#000"
+                        placeholderTextColor={colors.black}
                         inputMaskChange={(text: string) => setTelefone(text)}
                         keyboardType='number-pad'
                     />
@@ -227,6 +215,15 @@ export function Register() {
         console.log(hospitalId);
 
     }, [ocultaDados])
+
+    useEffect(() => {
+        if(risco === 1){setCorRisco(especColors.risco.naoUrgencia)}
+        if(risco === 2){setCorRisco(especColors.risco.poucaUrgencia)}
+        if(risco === 3){setCorRisco(especColors.risco.urgencia)}
+        if(risco === 4){setCorRisco(especColors.risco.muitaUrgencia)}
+        if(risco === 5){setCorRisco(especColors.risco.emergencia)}
+        if(!risco){setCorRisco(colors.white)}
+    }, [risco])
 
     return (
         <KeyboardAvoidingView
