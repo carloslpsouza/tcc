@@ -1,5 +1,6 @@
 import { Box, Circle, HStack, Text, useTheme, VStack, Pressable, IPressableProps, Skeleton } from 'native-base';
-import { ClockAfternoon, Hourglass, CircleWavyCheck, FirstAid, Truck, Buildings } from 'phosphor-react-native';
+import { ClockAfternoon, FirstAid, Truck, Buildings } from 'phosphor-react-native';
+import { useState } from 'react';
 import { especColors } from "../styles/especColors"
 import { msg } from "../utils/mensagensPadrao"
 
@@ -24,6 +25,7 @@ type Props = IPressableProps & {
 export function Order({ data, ...rest }: Props) {
   const { colors } = useTheme();
   const statusColor = (data.status === 'open' ? colors.gray[200] : colors.gray[100])
+  const [visto, setVisto] = useState(false)
   const risco = (par: number) => {
     if (par === 1) { return { 'cor': especColors.risco.naoUrgencia, 'msg': msg.risco.naoUrgencia }; }
     if (par === 2) { return { 'cor': especColors.risco.poucaUrgencia, 'msg': msg.risco.poucaUrgencia }; }
@@ -32,6 +34,11 @@ export function Order({ data, ...rest }: Props) {
     if (par === 5) { return { 'cor': especColors.risco.emergencia, 'msg': msg.risco.emergencia }; }
   }
 
+  function playChegHopistal() {
+    setTimeout(() => {
+      null
+    }, 5000);
+  }
 
   return (
     <Pressable {...rest}>
@@ -42,17 +49,22 @@ export function Order({ data, ...rest }: Props) {
         justifyContent="space-between"
         rounded="sm"
         overflow="hidden"
+        onTouchEnd={()=>{setVisto(true)}}
       >
         {
-          data.noHospital && data.risco >= 3 ? 
-          <Skeleton h={'full'} maxH={'149'} w={4} speed={6} startColor={risco(data.risco).cor}/> : 
-          <Box h="full" w={4} bg={risco(data.risco).cor} />
-        } 
+          data.noHospital && data.risco >= 2 && !visto ?
+            <>
+              {playChegHopistal}
+              <Skeleton h={'full'} maxH={'149'} w={4} speed={6} startColor={risco(data.risco).cor} />
+            </>
+            :
+            <Box h="full" w={4} bg={risco(data.risco).cor} />
+        }
         <VStack flex={1} my={5} ml={5}>
           {
             data.vtr &&
             <Text color={especColors.risco.emergencia} fontSize="md">
-              Origem: {data.vtr}
+              Origem: {data.vtr} { data.noHospital ? "Está no hospital" : "Deslocamento..."}
             </Text>
           }
           <Text color="black" fontSize="md">
