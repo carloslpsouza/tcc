@@ -88,7 +88,7 @@ export function Home() {
             .orderBy('risco', 'desc')
             .onSnapshot(snapshot => {
                 const data = snapshot.docs.map(doc => {
-                    const { status, paciente, risco, created_at, closed_at } = doc.data();
+                    const { status, paciente, risco, created_at, closed_at, vtr, noHospital } = doc.data();
                     console.log(statusSelected);                    
                     if (closed_at) {
                         let dataBd = closed_at ? closed_at.toDate().toString().substring(0, 9) : new Date().toDateString().substring(0, 9);
@@ -109,11 +109,13 @@ export function Home() {
                         paciente,
                         risco,
                         status,
-                        when: dateFormat(created_at)
+                        when: dateFormat(created_at),
+                        vtr,
+                        noHospital
                     }
 
                 });
-                //console.log(data);
+                console.log(data);
 
                 setAtendimentos(data);
                 getPacientes();
