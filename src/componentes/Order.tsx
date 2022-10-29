@@ -1,8 +1,9 @@
 import { Box, Circle, HStack, Text, useTheme, VStack, Pressable, IPressableProps, Skeleton } from 'native-base';
 import { ClockAfternoon, FirstAid, Truck, Buildings } from 'phosphor-react-native';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { especColors } from "../styles/especColors"
 import { msg } from "../utils/mensagensPadrao"
+import { getDado } from '../utils/LeDados'
 
 export type OrderProps = {
   id: string,
@@ -15,6 +16,7 @@ export type OrderProps = {
   when: string,
   vtr?: string,
   noHospital?: number,
+  vist?: number,
   status: 'open' | 'close',
 }
 
@@ -25,7 +27,8 @@ type Props = IPressableProps & {
 export function Order({ data, ...rest }: Props) {
   const { colors } = useTheme();
   const statusColor = (data.status === 'open' ? colors.gray[200] : colors.gray[100])
-  const [visto, setVisto] = useState(false)
+  const [visto, setVisto] = useState(0)
+
   const risco = (par: number) => {
     if (par === 1) { return { 'cor': especColors.risco.naoUrgencia, 'msg': msg.risco.naoUrgencia }; }
     if (par === 2) { return { 'cor': especColors.risco.poucaUrgencia, 'msg': msg.risco.poucaUrgencia }; }
@@ -40,6 +43,15 @@ export function Order({ data, ...rest }: Props) {
     }, 5000);
   }
 
+  function getVisto(id: string) {
+    getDado('ATENDIMENTO', id, 'Order.tsx - Visto()')
+      .then((data) => {
+        //console.log('log get Visto ===================');
+        setVisto(data.visto)
+        //console.log(data.visto)
+      })
+  }
+
   return (
     <Pressable {...rest}>
       <HStack
@@ -49,22 +61,24 @@ export function Order({ data, ...rest }: Props) {
         justifyContent="space-between"
         rounded="sm"
         overflow="hidden"
-        onTouchEnd={()=>{setVisto(true)}}
       >
         {
-          data.noHospital && data.risco >= 2 && !visto ?
+          data.noHospital && data.risco >= 2 && visto != 1 ?
             <>
-              {playChegHopistal}
+              {getVisto(data.id_at)}
               <Skeleton h={'full'} maxH={'149'} w={4} speed={6} startColor={risco(data.risco).cor} />
             </>
             :
-            <Box h="full" w={4} bg={risco(data.risco).cor} />
+            <>
+              <Box h="full" w={4} bg={risco(data.risco).cor} />
+            </>
+
         }
         <VStack flex={1} my={5} ml={5}>
           {
             data.vtr &&
             <Text color={especColors.risco.emergencia} fontSize="md">
-              Origem: {data.vtr} { data.noHospital ? "Está no hospital" : "Deslocamento..."}
+              Origem: {data.vtr} {data.noHospital ? "Está no hospital" : "Deslocamento..."}
             </Text>
           }
           <Text color="black" fontSize="md">

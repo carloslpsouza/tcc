@@ -4,16 +4,16 @@ import firestore from '@react-native-firebase/firestore';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { HStack, IconButton, VStack, useTheme, Text, Heading, FlatList, Center } from 'native-base';
 import { SignOut } from 'phosphor-react-native';
-
 import { dateFormat } from '../utils/firestoreDateFormats'
-
+import { Loading } from '../componentes/Loading';
 import Logo from '../assets/Logo.svg';
 import { Filter } from '../componentes/Filter';
 import { Button } from '../componentes/Button';
+
 import { Order, OrderProps } from '../componentes/Order'
 
-import { Loading } from '../componentes/Loading';
 import { Out } from '../utils/Out';
+import { atualizaDados } from '../utils/AtualizaDados'
 
 type RouteParams = { // Essa tipagem foi criada apenas para que o auto complite pudesse achar esse paramentro (Testar sem)
     hospitalId: string; //Erro de tipo não pode ser und (Consultar navigation.d.ts)
@@ -183,7 +183,12 @@ export function Home() {
                         <FlatList
                             data={orders}
                             keyExtractor={item => item.id}
-                            renderItem={({ item }) => <Order data={item} onPress={() => handleOpenDetails(item.id_at, hospitalId)} />}
+                            renderItem={({ item }) => <Order data={item} onPress={
+                                () => {
+                                    handleOpenDetails(item.id_at, hospitalId)
+                                    atualizaDados('ATENDIMENTO', item.id_at, {'visto': 1}, 'Home.tsx - FlatList')
+                                }
+                            } />}
                             showsHorizontalScrollIndicator={false}
                             contentContainerStyle={{ paddingBottom: 50 }}
                             ListEmptyComponent={() => (
